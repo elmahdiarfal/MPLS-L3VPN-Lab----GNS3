@@ -36,7 +36,7 @@ This lab shows how to configure an MPLS L3VPN with:
 
 - **GNS3**
 - **GNS3 VM**
-- **Cisco IOSv 15.9(3)M9** (image: `vios-adventerprisek9-m.spa.159-3.m9`)
+- **Cisco IOSv 15.9(3)M9** (image: `vios-adventerprisek9-m.spa.159-3.m9`) or any other Router image.
 
 ---
 
