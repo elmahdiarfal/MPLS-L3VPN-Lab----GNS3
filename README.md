@@ -1,193 +1,215 @@
-# MPLS-L3VPN-Lab----GNS3
-This repository contains a hands-on GNS3 lab implementing an MPLS Layer-3 VPN (L3VPN). 
-# MPLS L3VPN Lab (GNS3) — README
+# MPLS-L3VPN Lab — GNS3 🛠️
 
-## Project summary
+**Author:** El Mahdi ARFAL  
+**Academic Year:** 2025/2026  
+**Institution:** Institut National des Postes et Télécommunications  
 
-This repository contains a hands-on GNS3 lab implementing an MPLS Layer-3 VPN (L3VPN) using Cisco IOSv (vios-adventerprisek9).
-It demonstrates the core Service Provider (SP) building blocks: OSPF IGP, LDP, MPLS forwarding, VRFs on PE devices, and MP-BGP (vpnv4) to exchange customer routes. Customer edge (CE) routers run OSPF with their attached PE.
-
----
-
-## Objectives / Learning outcomes
-
-* Configure SP IGP (OSPF) across PE and P routers.
-* Enable LDP for label distribution and MPLS data plane.
-* Create VRF instances on PEs and attach CE links.
-* Configure MP-BGP (address-family vpnv4) between PEs to exchange VPN routes.
-* Redistribute between OSPF (customer) and BGP (vpnv4/VRF) to achieve full L3VPN reachability.
-* Verify with `show` commands and end-to-end pings (including `ping vrf ...`).
+A hands-on GNS3 lab implementing an MPLS Layer-3 VPN (L3VPN) using Cisco IOSv (vios-adventerprisek9). It demonstrates core Service Provider (SP) building blocks: OSPF IGP, LDP, MPLS forwarding, VRFs on PE devices, and MP-BGP (vpnv4) to exchange customer routes. Customer Edge (CE) routers run OSPF with their attached PE.
 
 ---
 
-## Topology (overview)
+## 🚀 Project summary
+
+This lab shows how to configure an MPLS L3VPN with:
+
+- OSPF as SP IGP  
+- LDP label distribution and MPLS forwarding  
+- VRFs on Provider Edge (PE) routers  
+- MP-BGP vpnv4 peering between PEs  
+- Redistribution between OSPF and BGP to ensure full VPN reachability  
+- End-to-end verification with `ping vrf` and `show` commands
+
+---
+
+## ✅ Objectives / Learning outcomes
+
+- Configure SP IGP (OSPF) across PE and P routers  
+- Enable LDP for label distribution and MPLS data plane  
+- Create VRF instances on PEs and attach CE links  
+- Configure MP-BGP vpnv4 between PEs to exchange VPN routes  
+- Redistribute between OSPF and BGP for L3VPN reachability  
+- Verify MPLS and VPN configurations with show commands and pings
+
+---
+
+## 🌐 Topology overview
 
 ![Topology](./Topology.png)
 
-* **SP network**
-
-  * `SP1-PE` — `SP2-P` — `SP3-PE` (linear)
-* **Customer network (Customer-1)**
-
-  * `HQ-CE` — `SP1-PE` (VRF CUSTOMER-1)
-  * `BRANCH-CE` — `SP3-PE` (VRF CUSTOMER-1)
+- **SP Network**:  
+  - `SP1-PE` — `SP2-P` — `SP3-PE` (linear)  
+- **Customer Network (Customer-1)**:  
+  - `HQ-CE` — `SP1-PE` (VRF CUSTOMER-1)  
+  - `BRANCH-CE` — `SP3-PE` (VRF CUSTOMER-1)
 
 ---
 
-## Addressing plan
+## 🌍 Addressing Plan
 
-### SP backbone / loopbacks
+### SP Backbone / Loopbacks
 
-* `SP1-PE` Loopback0: `172.16.1.1/32`
-* `SP2-P`  Loopback0: `172.16.0.1/32`
-* `SP3-PE` Loopback0: `172.16.2.1/32`
+| Device   | Interface   | IP Address       |
+|----------|-------------|------------------|
+| SP1-PE   | Loopback0   | 172.16.1.1/32    |
+| SP2-P    | Loopback0   | 172.16.0.1/32    |
+| SP3-PE   | Loopback0   | 172.16.2.1/32    |
 
-### SP interlinks
+### SP Interlinks
 
-* `SP1-PE` Gi0/0: `172.16.10.2/30` <-> `SP2-P` Gi0/0: `172.16.10.1/30`
-* `SP2-P` Gi0/1: `172.16.20.1/30` <-> `SP3-PE` Gi0/0: `172.16.20.2/30`
+| Link                     | IP Addresses                |
+|--------------------------|----------------------------|
+| SP1-PE Gi0/0 <-> SP2-P Gi0/0  | 172.16.10.2/30 <-> 172.16.10.1/30 |
+| SP2-P Gi0/1 <-> SP3-PE Gi0/0  | 172.16.20.1/30 <-> 172.16.20.2/30 |
 
-### Customer links / CE
+### Customer Links / CE
 
-* `SP1-PE` Gi0/1 (vrf CUSTOMER-1): `10.0.100.1/30` <-> `HQ-CE` Gi0/0: `10.0.100.2/30`
-* `SP3-PE` Gi0/1 (vrf CUSTOMER-1): `10.0.200.1/30` <-> `BRANCH-CE` Gi0/0: `10.0.200.2/30`
+| Link                              | IP Addresses                |
+|----------------------------------|----------------------------|
+| SP1-PE Gi0/1 (VRF CUSTOMER-1) <-> HQ-CE Gi0/0 | 10.0.100.1/30 <-> 10.0.100.2/30 |
+| SP3-PE Gi0/1 (VRF CUSTOMER-1) <-> BRANCH-CE Gi0/0 | 10.0.200.1/30 <-> 10.0.200.2/30 |
 
-### Customer loopbacks
+### Customer Loopbacks
 
-* `HQ-CE` Loopback0: `10.0.1.1/32`
-* `BRANCH-CE` Loopback0: `10.0.2.1/32`
+| Device   | Loopback0 IP    |
+|----------|-----------------|
+| HQ-CE    | 10.0.1.1/32     |
+| BRANCH-CE| 10.0.2.1/32     |
 
 ---
 
-## Files & repo structure (suggested)
+## 📁 Files & Repo Structure (suggested)
 
-```
 .
 ├── Topology.png
 ├── README.md
 ├── configs/
-│   ├── SP1-PE.cfg
-│   ├── SP2-P.cfg
-│   ├── SP3-PE.cfg
-│   ├── HQ-CE.cfg
-│   └── BRANCH-CE.cfg
+│ ├── SP1-PE.cfg
+│ ├── SP2-P.cfg
+│ ├── SP3-PE.cfg
+│ ├── HQ-CE.cfg
+│ └── BRANCH-CE.cfg
 └── gns3-project/
-```
+
+text
 
 ---
 
-## Key configuration snippets
+## 🔧 Key configuration snippets
 
-> These snippets reflect the lab design. Place full configs inside `configs/`.
+> These reflect the lab design. Full configs are inside `configs/`.
 
-### SP — common OSPF (backbone)
+### SP — Common OSPF (Backbone)
 
-```
 router ospf 1
- network 172.16.0.0 0.0.255.255 area 0
-```
+network 172.16.0.0 0.0.255.255 area 0
 
-### MPLS / LDP (enable per router)
 
-```
+### MPLS / LDP (Enable per router)
+
 mpls ldp router-id Loopback0 force
 
 interface GigabitEthernet0/0
- mpls ip
-```
+mpls ip
+
 
 ### VRF on PE (SP1-PE and SP3-PE)
 
-```
 ip vrf CUSTOMER-1
- rd 100:1
- route-target export 1:100
- route-target import 1:100
+rd 100:1
+route-target export 1:100
+route-target import 1:100
 
 interface GigabitEthernet0/1
- ip vrf forwarding CUSTOMER-1
- ip address 10.0.100.1 255.255.255.252
- no shutdown
-```
+ip vrf forwarding CUSTOMER-1
+ip address 10.0.100.1 255.255.255.252
+no shutdown
 
-### MP-BGP (iBGP between PEs using loopbacks)
 
-```
+### MP-BGP (iBGP between PEs using Loopbacks)
+
 router bgp 100
- neighbor 172.16.2.1 remote-as 100
- neighbor 172.16.2.1 update-source Loopback0
+neighbor 172.16.2.1 remote-as 100
+neighbor 172.16.2.1 update-source Loopback0
 
- address-family vpnv4
-  neighbor 172.16.2.1 activate
-  neighbor 172.16.2.1 send-community both
- exit-address-family
-```
+address-family vpnv4
+neighbor 172.16.2.1 activate
+neighbor 172.16.2.1 send-community both
+exit-address-family
 
-### VRF <-> IGP/BGP redistribution (PE)
 
-```
+### VRF <-> IGP/BGP Redistribution (PE)
+
 router ospf 10 vrf CUSTOMER-1
- network 10.0.0.0 0.0.255.255 area 0
- redistribute bgp 100 subnets
+network 10.0.0.0 0.0.255.255 area 0
+redistribute bgp 100 subnets
 
 router bgp 100
- address-family ipv4 vrf CUSTOMER-1
-  redistribute ospf 10 vrf CUSTOMER-1
- exit-address-family
-```
+address-family ipv4 vrf CUSTOMER-1
+redistribute ospf 10 vrf CUSTOMER-1
+exit-address-family
+
 
 ### CE OSPF (HQ-CE / BRANCH-CE)
 
-```
 router ospf 1
- log-adjacency-changes
- network 10.0.0.0 0.0.255.255 area 0
-```
+log-adjacency-changes
+network 10.0.0.0 0.0.255.255 area 0
+
 
 ---
 
-## Verification commands
+## ✅ Verification Commands
 
-```
 show mpls ldp neighbor
 show ip vrf detail
 show ip route vrf CUSTOMER-1
 show ip bgp vpnv4 all
-```
 
 ---
 
-## How to import / run in GNS3
+## ⚙️ How to import / run in GNS3
 
-1. Create a new GNS3 project.
-2. Drag 5 Cisco router nodes (SP1-PE, SP2-P, SP3-PE, HQ-CE, BRANCH-CE).
-3. Apply the interface mappings exactly as in `Topology.png`.
-4. Paste configs from `configs/` into each router.
-5. Start all nodes.
-6. Verify OSPF adjacencies, LDP neighbors, and MP-BGP vpnv4 peering.
-7. Test connectivity from PE Routers:
+### Method 1: Manual Setup
 
-   * `ping vrf CUSTOMER-1 10.0.100.2`
-   * `ping vrf CUSTOMER-1 10.0.200.2`
-   * CE-to-CE loopback reachability.
-  
-8. Chack CE Routers routing tables:
+1. Create a new GNS3 project.  
+2. Drag 5 Cisco router nodes (SP1-PE, SP2-P, SP3-PE, HQ-CE, BRANCH-CE).  
+3. Apply interface mappings exactly as in `Topology.png`.  
+4. Paste configs from `configs/` into each router.  
+5. Start all nodes.  
+6. Verify OSPF adjacencies, LDP neighbors, and MP-BGP vpnv4 peering.  
+7. Test connectivity from PE routers using:
 
-   * `show ip route`
+   - `ping vrf CUSTOMER-1 10.0.100.2`  
+   - `ping vrf CUSTOMER-1 10.0.200.2`  
+   - Verify CE-to-CE loopback reachability.
+
+8. Check CE routers' routing tables:
+
+   - `show ip route`
+
+### Method 2: Portable Project Import (Recommended) 📁
+
+You can use the portable project file included: `MPLS-L3VPN.gns3project`. Anyone with GNS3, GNS3 VM, and Cisco IOSv router image (`vios-adventerprisek9-m.spa.159-3.m9`) can:
+
+1. Open GNS3.  
+2. Go to **File > Import portable project**.  
+3. Select `MPLS-L3VPN.gns3project` from the repo root.  
+4. All topology, nodes, and configurations will be preloaded.  
+5. Start the project and begin lab exercises immediately.
 
 ---
 
-## Requirements
+## ⚠️ Requirements
 
-* **GNS3**
-* **Cisco IOSv 15.9(3)M9** (image: `vios-adventerprisek9-m.spa.159-3.m9`)
+- **GNS3**  
+- **Cisco IOSv 15.9(3)M9** (image: `vios-adventerprisek9-m.spa.159-3.m9`)
 
 ---
 
-## Notes
+## 📚 Notes
 
-This lab mirrors real SP MPLS L3VPN deployments and is a solid foundation for:
+This lab mirrors real Service Provider MPLS L3VPN deployments and is an excellent foundation for learning:
 
-* Understanding VRF separation
-* MP-BGP vpnv4 route exchange
-* MPLS label switching fundamentals
+- VRF separation  
+- MP-BGP vpnv4 route exchange  
+- MPLS label switching fundamentals
