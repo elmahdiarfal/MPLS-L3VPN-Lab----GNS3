@@ -32,6 +32,13 @@ This lab shows how to configure an MPLS L3VPN with:
 
 ---
 
+## ⚠️ Requirements
+
+- **GNS3**  
+- **Cisco IOSv 15.9(3)M9** (image: `vios-adventerprisek9-m.spa.159-3.m9`)
+
+---
+
 ## 🌐 Topology overview
 
 ![Topology](./Topology.png)
@@ -199,13 +206,6 @@ You can use the portable project file included: `MPLS-L3VPN.gns3project`. Anyone
 3. Select `MPLS-L3VPN.gns3project` from the repo root.  
 4. All topology, nodes, and configurations will be preloaded.  
 5. Start the project and begin lab exercises immediately.
-
----
-
-## ⚠️ Requirements
-
-- **GNS3**  
-- **Cisco IOSv 15.9(3)M9** (image: `vios-adventerprisek9-m.spa.159-3.m9`)
 
 ---
 
