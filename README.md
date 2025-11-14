@@ -1,4 +1,4 @@
-# MPLS-L3VPN Lab — GNS3 🛠️
+# MPLS-L3VPN Lab - GNS3 🛠️
 
 **Author:** El Mahdi ARFAL  
 **Academic Year:** 2025/2026  
