@@ -85,8 +85,7 @@ This lab shows how to configure an MPLS L3VPN with:
 
 ---
 
-## 📁 Files & Repo Structure (suggested)
-
+## 📁 Files & Repo Structure
 ```
 ├── Topology.png
 ├── README.md
