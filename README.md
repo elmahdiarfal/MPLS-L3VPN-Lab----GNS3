@@ -12,7 +12,8 @@ A hands-on GNS3 lab implementing an MPLS Layer-3 VPN (L3VPN) using Cisco IOSv (v
 
 This lab shows how to configure an MPLS L3VPN with:
 
-- OSPF as SP IGP  
+- OSPF as SP IGP
+- OSPF for routing in PE-CE
 - LDP label distribution and MPLS forwarding  
 - VRFs on Provider Edge (PE) routers  
 - MP-BGP vpnv4 peering between PEs  
